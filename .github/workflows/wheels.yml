@@ -8,11 +8,8 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+    name: Build Linux wheels
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
       with:
@@ -23,7 +20,6 @@ jobs:
         python-version: '3.10'
 
     - name: Set up QEMU
-      if: runner.os == 'Linux'
       uses: docker/setup-qemu-action@v3
       with:
         platforms: arm64
@@ -32,12 +28,10 @@ jobs:
       uses: pypa/cibuildwheel@v2.21
       env:
         CIBW_ARCHS_LINUX: x86_64 aarch64
-        CIBW_ARCHS_MACOS: x86_64 arm64
-        CIBW_ARCHS_WINDOWS: AMD64
 
     - uses: actions/upload-artifact@v4
       with:
-        name: wheels-${{ matrix.os }}
+        name: wheels
         path: wheelhouse/
 
   build_sdist:
